@@ -29,7 +29,7 @@ public class MoviesStorage implements IMoviesStorage {
 	
 	Map<String, List<MovieReview>> moviereviews = new HashMap<String, List<MovieReview>>();
 	private int numberOfMovieReviews = 0;
-	Map <String, List<String, Double>> helpfulnessUsers = new HashMap <String, List<String, Double>>();
+	//Map <String, List<String, Double>> helpfulnessUsers = new HashMap <String, List<String, Double>>();
 
     public MoviesStorage(final MoviesProvider provider) {
         //TODO: read movies using provider interface
@@ -217,7 +217,8 @@ public class MoviesStorage implements IMoviesStorage {
 
     @Override
     public Map<String, Double> topKHelpfullUsers(int k) {
-        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	//return null;
+        throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
 
     @Override
