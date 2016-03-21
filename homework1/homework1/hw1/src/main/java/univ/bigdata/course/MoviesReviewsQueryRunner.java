@@ -15,7 +15,6 @@ public class MoviesReviewsQueryRunner {
     	String inputFileName = null,outputFileName = null;
     	//Find the names of input and output files from String[] args
     	for(int i = 0; i < args.length; i++) {
-    	 	System.out.println(args[i]);
             if(args[i].matches("-inputFile"))
             {
             	if(args.length-1 == i)
@@ -91,7 +90,7 @@ public class MoviesReviewsQueryRunner {
             storage.moviesReviewWordsCount(100)
                     .entrySet()
                     .forEach(pair -> printer.println("Word = [" + pair.getKey() + "], number of occurrences [" + pair.getValue() + "]."));
-
+			
             /*     // 8.
             printer.println();
             printer.println("Computing TOP100 words count for TOP100 movies");
@@ -123,11 +122,11 @@ public class MoviesReviewsQueryRunner {
             storage.topKHelpfullUsers(100)
                     .entrySet()
                     .forEach(pair -> printer.println("User id = [" + pair.getKey() + "], helpfulness [" + pair.getValue() + "]."));
-
+                    */
             // 11.
             printer.println();
             printer.println("Total number of distinct movies reviewed [" +storage.moviesCount() + "].");
-            printer.println("THE END.");*/
+            printer.println("THE END.");
         } catch (final Exception e) {
             e.printStackTrace();
         }
