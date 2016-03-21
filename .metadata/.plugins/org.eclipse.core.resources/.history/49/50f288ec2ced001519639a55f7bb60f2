@@ -1,0 +1,213 @@
+package univ.bigdata.course;
+
+import univ.bigdata.course.movie.Movie;
+import univ.bigdata.course.movie.MovieReview;
+import univ.bigdata.course.providers.MoviesProvider;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Main class which capable to keep all information regarding movies review.
+ * Has to implements all methods from @{@link IMoviesStorage} interface.
+ * Also presents functionality to answer different user queries, such as:
+ * <p>
+ * 1. Total number of distinct movies reviewed.
+ * 2. Total number of distinct users that produces the review.
+ * 3. Average review score for all movies.
+ * 4. Average review score per single movie.
+ * 5. Most popular movie reviewed by at least "K" unique users
+ * 6. Word count for movie review, select top "K" words
+ * 7. K most helpful users
+ */
+public class MoviesStorage implements IMoviesStorage {
+	
+	Map<String, List<MovieReview>> moviereviews = new HashMap<String, List<MovieReview>>();
+	private int numberOfMovieReviews = 0;
+
+    public MoviesStorage(final MoviesProvider provider) {
+        //TODO: read movies using provider interface
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	MovieReview review;
+    	List<MovieReview> listOfMovie;
+    	
+    	while(provider.hasMovie())
+    	{
+    		review = provider.getMovie();
+    		listOfMovie = moviereviews.get(review.getMovie().getProductId());
+    		if(listOfMovie == null)
+    		{
+    			listOfMovie = new ArrayList<MovieReview>();
+    			listOfMovie.add(review);
+    			moviereviews.put(review.getMovie().getProductId(), listOfMovie);
+    		}
+    		else
+    			listOfMovie.add(review);
+    		numberOfMovieReviews++;
+    	}
+    }
+
+    @Override
+    public double totalMoviesAverageScore() {
+    	double score = 0; 
+    	for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
+            List<MovieReview> reviews = entry.getValue();
+            for(MovieReview review : reviews)
+            	score+=review.getMovie().getScore();
+        }
+    	if(numberOfMovieReviews==0)
+    		throw new UnsupportedOperationException("The movie reviews = null");
+        return score/numberOfMovieReviews;
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public double totalMovieAverage(String productId) {
+    	double totalAverage = 0;
+    	int count = 0;
+    	List<MovieReview> reviews = moviereviews.get(productId);
+        for(MovieReview review : reviews)
+        {
+        	totalAverage+=review.getMovie().getScore();
+        	count++;
+        }
+        return totalAverage/count;
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+	@Override
+    public List<Movie> getTopKMoviesAverage(long topK) {
+    	List<Movie> movieList = new ArrayList<Movie>();
+    	List<Movie>returnList = new ArrayList<Movie>();
+        for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) 
+        {
+        	double averageScore = 0;
+        	String key = entry.getKey();
+        	averageScore = totalMovieAverage(key);
+        	movieList.add(new Movie(key,averageScore));
+        }
+       Collections.sort(movieList, new Movie());
+        for(int i=0;i<topK;i++)
+        	returnList.add(movieList.get(i));
+    	return returnList;
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public Movie movieWithHighestAverage() {
+    	return getTopKMoviesAverage(1).get(0);
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public List<Movie> getMoviesPercentile(double percentile) {
+        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public String mostReviewedProduct() {
+    	Map<String, Long> mostPopularMovieReviewed;
+		mostPopularMovieReviewed =  reviewCountPerMovieTopKMovies(1);
+		Map.Entry<String,Long> entry = null;
+	
+		entry=mostPopularMovieReviewed.entrySet().iterator().next();
+		if(entry==null){
+		throw new UnsupportedOperationException("No movie with Review ");
+		}
+		
+		return entry.getKey();
+    
+    }
+
+    @Override
+    public Map<String, Long> reviewCountPerMovieTopKMovies(int topK) {
+    	List<Movie> movieList = new ArrayList<Movie>();
+
+    	Map<String, Long>returnMap = new LinkedHashMap<String, Long>();
+        for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) 
+        {
+        	double countReview = 0;
+        	String key = entry.getKey();
+        	List<MovieReview> reviews = moviereviews.get(key);
+        	countReview = reviews.size();
+        	movieList.add(new Movie(key,countReview));
+        }
+        Collections.sort(movieList, new Movie());
+        for(int i=0;i<topK;i++)
+        returnMap.put(movieList.get(i).getProductId(),(long) movieList.get(i).getScore());
+        
+    	return returnMap;
+//        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+   
+
+	@Override
+    public String mostPopularMovieReviewedByKUsers(int numOfUsers) {
+		Map<String, Long> mostPopularMovieReviewed;
+		mostPopularMovieReviewed =  reviewCountPerMovieTopKMovies(1);
+		Map.Entry<String,Long> entry=mostPopularMovieReviewed.entrySet().iterator().next();
+		
+		if(entry.getValue() > numOfUsers)
+			return entry.getKey();
+		else
+		throw new UnsupportedOperationException("No movie with such numOfUsers");
+    }
+
+    @Override
+    public Map<String, Long> moviesReviewWordsCount(int topK) {
+    	 Map<String, Long> map = new LinkedHashMap<>();
+       	 int count =0 ;
+    	 for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
+    		 count ++;
+             List<MovieReview> reviews = entry.getValue();
+             for(MovieReview review : reviews){
+            	 String[] words= review.getReview().split("\\s+");   	    
+				for (String w : words) {
+	    	        Long n = map.get(w);
+	    	        n = (n == null) ? 1 : ++n;
+	    	        map.put(w, n);
+	    	    }
+             }
+    	 }
+    	 List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(map.entrySet());
+    	 Collections.sort(wordsCount, new Comparator<Map.Entry<String, Integer>>() {
+    		  public int compare(Map.Entry<String, Integer> a, Map.Entry<String, Integer> b){
+    		    return a.getValue().compareTo(b.getValue());
+    		  }
+    		});
+    	 Map<String, Long> sortedMap = new LinkedHashMap<String, Long>();
+         for(int i=0;i<topK;i++){
+        	 Map.Entry<String,Long> entry = null;
+        		
+     		entry=sortedMap.entrySet().iterator().next();
+        	sortedMap.put(entry.getKey(), entry.getValue())
+        }
+    	 if(map!=null)
+    		 return map;
+    	 
+    	 else 
+    		 throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	 
+    }
+
+    @Override
+    public Map<String, Long> topYMoviewsReviewTopXWordsCount(int topMovies, int topWords) {
+        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public Map<String, Double> topKHelpfullUsers(int k) {
+        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+
+    @Override
+    public long moviesCount() {
+        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+}

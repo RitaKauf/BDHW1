@@ -1,0 +1,56 @@
+package univ.bigdata.course.movie;
+
+public class Movie {
+
+    private String productId;
+
+    private double score;
+
+    public Movie() {
+    }
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof Movie))return false;
+        Movie otherMovie = (Movie)other;
+        if((this!=null)&&(otherMovie!=null)){
+        if(otherMovie.productId==this.productId){
+        	return true;
+        }
+        }
+        else
+        {
+        	return false;
+        }
+    }
+    public Movie(String productId, double score) {
+        this.productId = productId;
+        this.score = score;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "productId='" + productId + '\'' +
+                ", score=" + score +
+                '}';
+    }
+
+}

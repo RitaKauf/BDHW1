@@ -1,0 +1,92 @@
+package univ.bigdata.course.providers;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Date;
+import java.util.Scanner;
+
+import univ.bigdata.course.movie.Movie;
+import univ.bigdata.course.movie.MovieReview;
+
+public class FileIOMoviesProvider implements MoviesProvider {
+	
+	private String inputFileName = null;
+	private Scanner scanner = null;
+	
+	public FileIOMoviesProvider(final String inputfilename)
+	{
+		inputFileName = inputfilename;
+		File file = new File(inputFileName);
+		try {
+			scanner = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+    @Override
+    public boolean hasMovie() {
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	boolean rtn;
+    	rtn = scanner.hasNext();
+    	if(!rtn)
+    		scanner.close();
+    	return rtn;
+    }
+
+    @Override
+    public MovieReview getMovie() {
+        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	MovieReview moviereview = null;
+    	Movie movie;
+    	double score;
+    	Date time;
+    	String review = null;
+    	String productId = "product/productId: ";
+    	String userId = "	review/userId: ";
+    	String profileName = "	review/profileName: ";
+    	String helpfulness = "	review/helpfulness: ";
+    	String strScore = "	review/score: ";
+    	String strTime = "	review/time: ";
+    	String summary = "	review/summary: ";
+    	String text = "	review/text: ";
+    	review = scanner.nextLine();
+    	if(review==null){
+    		throw new UnsupportedOperationException("Null review");
+    	}
+    	productId = review.substring(review.indexOf(productId)+productId.length(), review.indexOf(userId));
+    	if(productId==null){
+    		throw new UnsupportedOperationException("Null productId");
+    	}
+    	userId = review.substring(review.indexOf(userId)+userId.length(), review.indexOf(profileName));
+    	if(userId==null){
+    		throw new UnsupportedOperationException("Null userId");
+    	}
+    	profileName = review.substring(review.indexOf(profileName)+profileName.length(), review.indexOf(helpfulness));
+    	if(profileName==null){
+    		throw new UnsupportedOperationException("Null profileName");
+    	}
+    	helpfulness = review.substring(review.indexOf(helpfulness)+helpfulness.length(), review.indexOf(strScore));
+    	if(helpfulness==null){
+    		throw new UnsupportedOperationException("Null helpfulness");
+    	}
+    	strScore = review.substring(review.indexOf(strScore)+strScore.length(), review.indexOf(strTime));
+    	if(strScore==null){
+    		throw new UnsupportedOperationException("Null strScore");
+    	}
+//    	score = Double.parseDouble(strScore);
+    	strTime = review.substring(review.indexOf(strTime)+strTime.length(), review.indexOf(summary));
+    	if(strTime==null){
+    		throw new UnsupportedOperationException("Null strTime");
+    	}
+//    	time = new Date(Integer.parseInt(strTime));
+    	summary = review.substring(review.indexOf(summary)+summary.length(), review.indexOf(text));
+    	if(summary==null){
+    		throw new UnsupportedOperationException("Null summary");
+    	}
+    	text = review.substring(review.indexOf(text)+text.length(), review.length());
+    	movie = new Movie(productId,score);
+    	moviereview = new MovieReview(movie,userId,profileName,helpfulness,time,summary,text);
+    	return moviereview;
+    }
+}
