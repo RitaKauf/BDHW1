@@ -14,25 +14,14 @@ public class MoviesReviewsQueryRunner {
         // opening stream for writing the output and validating.
     	String inputFileName = null,outputFileName = null;
     	//Find the names of input and output files from String[] args
-    	for(int i = 0; i < args.length; i++) {
-    	 	System.out.println(args[i]);
-            if(args[i].matches("-inputFile"))
-            {
-            	if(args.length-1 == i)
-            	{
-                    throw new UnsupportedOperationException("Error: no input files");
-            	}
-            	inputFileName = args[i+1];
-            }
-            if(args[i].matches("-outputFile"))
-            {
-            	if(args.length-1 == i)
-            	{
-                    throw new UnsupportedOperationException("Error: no output files");
-            	}
-            	outputFileName = args[i+1];
-            }
-    	}
+    	
+    
+    	inputFileName = args[0].split("(-inputFile=)")[1];
+    	inputFileName = "src/main/resources/" + inputFileName;
+    	outputFileName = args[1].split("(-outputFile=)")[1];
+    	
+       	 
+    	
     	//Check if all parameters is insert
     	if(outputFileName == null || inputFileName == null)
     	{

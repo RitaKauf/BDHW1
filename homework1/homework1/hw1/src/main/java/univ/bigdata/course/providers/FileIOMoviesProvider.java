@@ -16,6 +16,7 @@ public class FileIOMoviesProvider implements MoviesProvider {
 	public FileIOMoviesProvider(final String inputfilename)
 	{
 		inputFileName = inputfilename;
+		
 		File file = new File(inputFileName);
 		try {
 			scanner = new Scanner(file);
