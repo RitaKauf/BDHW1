@@ -3,5 +3,5 @@
 /home/vagrant/hw1/src/main/java/univ/bigdata/course/MoviesStorage.java
 /home/vagrant/hw1/src/main/java/univ/bigdata/course/MoviesReviewsQueryRunner.java
 /home/vagrant/hw1/src/main/java/univ/bigdata/course/movie/Movie.java
-/home/vagrant/hw1/src/main/java/univ/bigdata/course/movie/MovieReview.java
 /home/vagrant/hw1/src/main/java/univ/bigdata/course/providers/FileIOMoviesProvider.java
+/home/vagrant/hw1/src/main/java/univ/bigdata/course/movie/MovieReview.java
