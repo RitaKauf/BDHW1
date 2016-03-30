@@ -165,14 +165,18 @@ public class MoviesStorage implements IMoviesStorage {
 
 	@Override
     public String mostPopularMovieReviewedByKUsers(int numOfUsers) {
-		Map<String, Long> mostPopularMovieReviewed;
-		mostPopularMovieReviewed =  reviewCountPerMovieTopKMovies(1);
-		Map.Entry<String,Long> entry=mostPopularMovieReviewed.entrySet().iterator().next();
+
+		List <Movie> moviesHighScore = getTopKMoviesAverage(moviesCount());
 		
-		if(entry.getValue() > numOfUsers)
-			return entry.getKey();
-		else
-		throw new UnsupportedOperationException("No movie with such numOfUsers");
+		for(Movie tempMovie: moviesHighScore)
+		{
+			int numOfRev = moviereviews.get(tempMovie.getProductId()).size();
+			if(numOfRev >= numOfUsers)
+				return tempMovie.getProductId();
+		}
+
+		return null;
+
     }
 
     @Override
