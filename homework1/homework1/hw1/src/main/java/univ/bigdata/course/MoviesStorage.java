@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,18 +31,19 @@ public class MoviesStorage implements IMoviesStorage {
 	
 	Map<String, List<MovieReview>> moviereviews = new HashMap<String, List<MovieReview>>();
 	private int numberOfMovieReviews = 0;
-	//Map <String, List<String, Double>> helpfulnessUsers = new HashMap <String, List<String, Double>>();
+	Map <String, List<String>> helpfulnessUsers = new HashMap <String, List<String>>();
 
     public MoviesStorage(final MoviesProvider provider) {
         //TODO: read movies using provider interface
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     	MovieReview review;
     	List<MovieReview> listOfMovie;
-    	
+    	List <String> helpfulness;
     	while(provider.hasMovie())
     	{
     		review = provider.getMovie();
     		listOfMovie = moviereviews.get(review.getMovie().getProductId());
+    		helpfulness = helpfulnessUsers.get(review.getUserId());
     		if(listOfMovie == null)
     		{
     			listOfMovie = new ArrayList<MovieReview>();
@@ -50,6 +52,14 @@ public class MoviesStorage implements IMoviesStorage {
     		}
     		else
     			listOfMovie.add(review);
+    		if(helpfulness == null)
+    		{
+    			helpfulness = new ArrayList<String>();
+    			helpfulness.add(review.getHelpfulness());
+    			helpfulnessUsers.put(review.getUserId(), helpfulness);
+    		}
+    		else
+    			helpfulness.add(review.getHelpfulness());
     		numberOfMovieReviews++;
     	}
     }
@@ -64,7 +74,7 @@ public class MoviesStorage implements IMoviesStorage {
         }
     	if(numberOfMovieReviews==0)
     		throw new UnsupportedOperationException("The movie reviews = null");
-        return score/numberOfMovieReviews;
+        return round(score/numberOfMovieReviews,5);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
 
@@ -78,7 +88,7 @@ public class MoviesStorage implements IMoviesStorage {
         	totalAverage+=review.getMovie().getScore();
         	count++;
         }
-        return totalAverage/count;
+        return round(totalAverage/count,5);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
 
@@ -102,6 +112,7 @@ public class MoviesStorage implements IMoviesStorage {
 
     @Override
     public Movie movieWithHighestAverage() {
+    	
     	return getTopKMoviesAverage(1).get(0);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
@@ -167,7 +178,7 @@ public class MoviesStorage implements IMoviesStorage {
     @Override
     public Map<String, Long> moviesReviewWordsCount(int topK) {
     	 Map<String, Long> map = new LinkedHashMap<>();
-       	 int count =0 ;
+       	 int count =0;
     	 for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
     		 count ++;
              List<MovieReview> reviews = entry.getValue();
@@ -193,7 +204,7 @@ public class MoviesStorage implements IMoviesStorage {
 //    				}
 //    				if(c>0)
 //    					return -1;
-    				 return 0;
+    				 return a.getKey().compareTo(b.getKey());
     				}
     			 if (a.getValue() > b.getValue())
    					return -1;
@@ -270,11 +281,55 @@ public class MoviesStorage implements IMoviesStorage {
     	return mapToReturn;
     }
 
-    @Override
+    @SuppressWarnings("unused")
+	@Override
     public Map<String, Double> topKHelpfullUsers(int k) {
     	//return null;
-        throw new UnsupportedOperationException("You have to implement this method on your own.");
-    }
+    	Map<String, Double> list = new HashMap<>();
+    	int count = 0;
+    	int score = 0;
+    	for (Map.Entry<String, List<String>> entry : helpfulnessUsers.entrySet()) 
+        {
+    		count = 0;
+    		score = 0;
+    		for(String helpfulness : entry.getValue())
+    		{
+    			String[] parts = helpfulness.split("/");
+    			score+= Integer.parseInt(parts[0]);
+    			count+= Integer.parseInt(parts[1]);
+    		}
+    		if(count!=0)
+    			list.put(entry.getKey(),Double.valueOf(round((double)score/count, 5)));
+    		
+        }
+    	List<Map.Entry<String, Double>> sortList=new ArrayList<Map.Entry<String, Double>>(list.entrySet());
+    	Collections.sort(sortList, new Comparator<Map.Entry<String, Double>>() {
+  		  public int compare(Map.Entry<String, Double> a, Map.Entry<String, Double> b){
+  			 if(a.getValue().doubleValue() == b.getValue().doubleValue())
+  			{
+  				 return a.getKey().compareTo(b.getKey());
+  			}
+  			if (a.getValue().doubleValue() > b.getValue().doubleValue())
+ 				return -1;
+  			else 
+  			 	return 1;
+  				 
+  		 }
+  		});
+    	Map<String, Double> sortedMap = new LinkedHashMap<String, Double>();
+    	count = 0;
+    	for(Map.Entry<String, Double> entry : sortList)
+    	{
+    		if(count>=k)
+    			break;
+    		sortedMap.put(entry.getKey(),entry.getValue());
+    		count++;
+    	}
+    	 if(sortedMap!=null)
+    		 return sortedMap;
+    	 else 
+    		 throw new UnsupportedOperationException("List topKHelpfullUsers is null.");
+    	 }
 
     @Override
     public long moviesCount() {
@@ -282,8 +337,15 @@ public class MoviesStorage implements IMoviesStorage {
    	 	for (@SuppressWarnings("unused") Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
     		Count++;
         }
-   	 	//Hiiii
     	return Count;
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
+    }
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 }
