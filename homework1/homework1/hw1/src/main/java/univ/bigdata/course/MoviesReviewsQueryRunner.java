@@ -65,14 +65,14 @@ public class MoviesReviewsQueryRunner {
            printer.println();
             printer.println("The most reviewed movie product id is " + storage.mostReviewedProduct());
 
-            // 6.
+            
                         printer.println();
-//            printer.println("Computing 90th percentile of all movies average.");
-//            storage.getMoviesPercentile(90).stream().forEach(printer::println);
-//             
-//            printer.println();
-//            printer.println("Computing 50th percentile of all movies average.");
-//            storage.getMoviesPercentile(50).stream().forEach(printer::println);
+            printer.println("Computing 90th percentile of all movies average.");
+            storage.getMoviesPercentile(90).stream().forEach(printer::println);
+             
+            printer.println();
+            printer.println("Computing 50th percentile of all movies average.");
+            storage.getMoviesPercentile(50).stream().forEach(printer::println);
 
             // 7.
             printer.println();
