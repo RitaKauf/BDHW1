@@ -196,7 +196,7 @@ public class MoviesStorage implements IMoviesStorage {
     	 List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(map.entrySet());
     	 Collections.sort(wordsCount, new Comparator<Map.Entry<String, Long>>() {
     		  public int compare(Map.Entry<String, Long> a, Map.Entry<String, Long> b){
-    			 if(a.getValue() == b.getValue())
+    			 if(a.getValue().equals(b.getValue()))
     				{
 //    				int c = a.getKey().compareTo(b.getKey()); 
 //    				if(c<=0){
@@ -206,7 +206,7 @@ public class MoviesStorage implements IMoviesStorage {
 //    					return -1;
     				 return a.getKey().compareTo(b.getKey());
     				}
-    			 if (a.getValue() > b.getValue())
+    			 if (a.getValue().longValue() > b.getValue().longValue())
    					return -1;
     			 else 
     			 	return 1;
@@ -256,11 +256,11 @@ public class MoviesStorage implements IMoviesStorage {
 		List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(mapToReturnPreSorting.entrySet());
    	 	Collections.sort(wordsCount, new Comparator<Map.Entry<String, Long>>() {
    		  public int compare(Map.Entry<String, Long> a, Map.Entry<String, Long> b){
-   			 if(a.getValue() == b.getValue())
+   			 if(a.getValue().equals(b.getValue()))
    				{
    				 return a.getKey().compareTo(b.getKey());
    				}
-   			 if (a.getValue() > b.getValue())
+   			 if (a.getValue().longValue() > b.getValue().longValue())
   					return -1;
    			 else 
    			 	return 1;
