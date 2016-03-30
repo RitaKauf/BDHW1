@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Main class which capable to keep all information regarding movies review.
@@ -139,6 +140,9 @@ public class MoviesStorage implements IMoviesStorage {
         	movieList.add(new Movie(key,countReview));
         }
         Collections.sort(movieList, new Movie());
+        
+        if(movieList.size()< topK)
+        	topK = movieList.size();
         for(int i=0;i<topK;i++)
         returnMap.put(movieList.get(i).getProductId(),(long) movieList.get(i).getScore());
         
@@ -212,7 +216,58 @@ public class MoviesStorage implements IMoviesStorage {
 
     @Override
     public Map<String, Long> topYMoviewsReviewTopXWordsCount(int topMovies, int topWords) {
-        throw new UnsupportedOperationException("You have to implement this method on your own.");
+    	Map<String,Long> mapToReturn= new LinkedHashMap<String,Long>();
+    	Map<String, Long> mReviewedMovies = reviewCountPerMovieTopKMovies(topMovies);
+    	
+    	Map<String,Long> mapToReturnPreSorting= new LinkedHashMap<String,Long>();
+    	int counter = 0;
+    	for(Map.Entry<String, Long> entry : mReviewedMovies.entrySet()) {
+    		if(counter > topMovies)
+    			break;
+    		
+    		List<MovieReview> reviewsForMovie = moviereviews.get(entry.getKey());
+    		
+            for(MovieReview review : reviewsForMovie){
+           	 String[] words= review.getReview().split("\\s");   	    
+				for (String w : words) {
+//   				String w = W.toLowerCase();
+	    	        Long n = mapToReturnPreSorting.get(w);
+	    	        n = (n == null) ? 1 : ++n;
+	    	        mapToReturnPreSorting.put(w, n);
+	    	    }
+			
+            }
+	       	 
+    		counter ++;
+    	}
+    	
+		//sorting the words by count
+		List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(mapToReturnPreSorting.entrySet());
+   	 	Collections.sort(wordsCount, new Comparator<Map.Entry<String, Long>>() {
+   		  public int compare(Map.Entry<String, Long> a, Map.Entry<String, Long> b){
+   			 if(a.getValue() == b.getValue())
+   				{
+   				 return a.getKey().compareTo(b.getKey());
+   				}
+   			 if (a.getValue() > b.getValue())
+  					return -1;
+   			 else 
+   			 	return 1;
+   				 
+   		 }
+   		});
+   	 	int tWordsTemp = 0;
+   	 	if(wordsCount.size() < topWords)
+   	 		tWordsTemp = wordsCount.size();
+   	 	else 
+   	 		tWordsTemp = topWords;
+   	 	
+        for(int i=0;i<tWordsTemp;i++){
+        	
+        	mapToReturn.put(wordsCount.get(i).getKey(), wordsCount.get(i).getValue());
+        }
+    	
+    	return mapToReturn;
     }
 
     @Override

@@ -81,7 +81,7 @@ public class MoviesReviewsQueryRunner {
                     .entrySet()
                     .forEach(pair -> printer.println("Word = [" + pair.getKey() + "], number of occurrences [" + pair.getValue() + "]."));
 			
-            /*     // 8.
+                 // 8.
             printer.println();
             printer.println("Computing TOP100 words count for TOP100 movies");
             storage.topYMoviewsReviewTopXWordsCount(100, 100)
@@ -92,7 +92,7 @@ public class MoviesReviewsQueryRunner {
             storage.topYMoviewsReviewTopXWordsCount(100, 10)
                     .entrySet()
                     .forEach(pair -> printer.println("Word = [" + pair.getKey() + "], number of occurrences [" + pair.getValue() + "]."));
-
+/*
             // 9.
             printer.println();
             printer.println("Most popular movie with highest average score, reviewed by at least 20 users " + storage.mostPopularMovieReviewedByKUsers(20));
@@ -100,7 +100,7 @@ public class MoviesReviewsQueryRunner {
             printer.println("Most popular movie with highest average score, reviewed by at least 10 users " + storage.mostPopularMovieReviewedByKUsers(10));
             printer.println("Most popular movie with highest average score, reviewed by at least 5 users " + storage.mostPopularMovieReviewedByKUsers(5));
 
-            // 10.
+             10.
             printer.println();
             printer.println("Compute top 10 most helpful users.");
             storage.topKHelpfullUsers(10)

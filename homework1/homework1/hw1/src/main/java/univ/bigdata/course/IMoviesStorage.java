@@ -14,7 +14,7 @@ public interface IMoviesStorage {
      */
     double totalMoviesAverageScore();
 
-    /**
+    /**sdfsdfdsfsfsfd
      * For given movies calculates an average score of this movie.
      *
      * @param productId - id of the movie to calculate the average score.
