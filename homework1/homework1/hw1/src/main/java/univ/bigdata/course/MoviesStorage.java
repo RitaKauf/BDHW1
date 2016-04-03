@@ -233,34 +233,33 @@ public class MoviesStorage implements IMoviesStorage {
     	 
     }
 
-    @Override
+       @Override
     public Map<String, Long> topYMoviewsReviewTopXWordsCount(int topMovies, int topWords) {
+    	//mapToReturn = the final map that will be returned
     	Map<String,Long> mapToReturn= new LinkedHashMap<String,Long>();
-    	Map<String, Long> mReviewedMovies = reviewCountPerMovieTopKMovies(topMovies);
+    	// mReviewedMovies = top topWords movies and their number of reviews
+    	Map<String, Long> mReviewedMovies = reviewCountPerMovieTopKMovies(topMovies);// mReviewedMovies = top topWords movies and their number of reviews
     	
     	Map<String,Long> mapToReturnPreSorting= new LinkedHashMap<String,Long>();
-    	int counter = 0;
+    	
+    	//goes over the reviews and adds each word to mapToReturnPreSorting
     	for(Map.Entry<String, Long> entry : mReviewedMovies.entrySet()) {
-    		if(counter > topMovies)
-    			break;
     		
     		List<MovieReview> reviewsForMovie = moviereviews.get(entry.getKey());
     		
             for(MovieReview review : reviewsForMovie){
            	 String[] words= review.getReview().split("\\s");   	    
-				for (String w : words) {
-//   				String w = W.toLowerCase();
+				for (String w : words) {//goes over the words in the review
 	    	        Long n = mapToReturnPreSorting.get(w);
-	    	        n = (n == null) ? 1 : ++n;
+	    	        n = (n == null) ? 1 : ++n;//adding to the appearances number of that word
 	    	        mapToReturnPreSorting.put(w, n);
 	    	    }
 			
             }
-	       	 
-    		counter ++;
+
     	}
     	
-		//sorting the words by count
+		//sorting the words by appearances number of each word in mapToReturnPreSorting
 		List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(mapToReturnPreSorting.entrySet());
    	 	Collections.sort(wordsCount, new Comparator<Map.Entry<String, Long>>() {
    		  public int compare(Map.Entry<String, Long> a, Map.Entry<String, Long> b){
@@ -281,6 +280,7 @@ public class MoviesStorage implements IMoviesStorage {
    	 	else 
    	 		tWordsTemp = topWords;
    	 	
+   	 	//resizing wordsCount so that it'll contain only 'topWords' words
         for(int i=0;i<tWordsTemp;i++){
         	
         	mapToReturn.put(wordsCount.get(i).getKey(), wordsCount.get(i).getValue());
