@@ -118,11 +118,8 @@ public class MoviesStorage implements IMoviesStorage {
         //Sort this list  and add topK to  returnList and return it
        Collections.sort(movieList, new Movie());
         for(int i=0;i<topK;i++)
-        	if(!returnList.isEmpty())
+        	
         	returnList.add(movieList.get(i));
-        	else {
-        		throw new UnsupportedOperationException("No Movies at all");
-        	}
     	return returnList;
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
