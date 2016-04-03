@@ -40,10 +40,13 @@ public class MoviesStorage implements IMoviesStorage {
     	List<MovieReview> listOfMovie;
     	List <String> helpfulness;
     	while(provider.hasMovie())
-    	{
+    	{	
+    		//get Movie review from input 
     		review = provider.getMovie();
+    		//Get movie review list for this movie by product id 
     		listOfMovie = moviereviews.get(review.getMovie().getProductId());
     		helpfulness = helpfulnessUsers.get(review.getUserId());
+    		//Add this review to the list , if the list is empty creat it and add this review
     		if(listOfMovie == null)
     		{
     			listOfMovie = new ArrayList<MovieReview>();
@@ -52,6 +55,7 @@ public class MoviesStorage implements IMoviesStorage {
     		}
     		else
     			listOfMovie.add(review);
+    		//Add the helpfulness to the list , if the list is empty create it and add this review
     		if(helpfulness == null)
     		{
     			helpfulness = new ArrayList<String>();
@@ -60,13 +64,16 @@ public class MoviesStorage implements IMoviesStorage {
     		}
     		else
     			helpfulness.add(review.getHelpfulness());
+    		// increase review number by 1
     		numberOfMovieReviews++;
     	}
     }
 
     @Override
     public double totalMoviesAverageScore() {
+    	//initiate score to 0;
     	double score = 0; 
+    	//for each movie , get review list , and sum all reviews 
     	for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
             List<MovieReview> reviews = entry.getValue();
             for(MovieReview review : reviews)
@@ -74,6 +81,7 @@ public class MoviesStorage implements IMoviesStorage {
         }
     	if(numberOfMovieReviews==0)
     		throw new UnsupportedOperationException("The movie reviews = null");
+    	//retrun score/ numberOfMovieReviews which holds how many reviews there are
         return round(score/numberOfMovieReviews,5);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
@@ -82,20 +90,24 @@ public class MoviesStorage implements IMoviesStorage {
     public double totalMovieAverage(String productId) {
     	double totalAverage = 0;
     	int count = 0;
+    	//for each review , add review score to totalAverage and count how many there are in count
     	List<MovieReview> reviews = moviereviews.get(productId);
         for(MovieReview review : reviews)
         {
         	totalAverage+=review.getMovie().getScore();
         	count++;
         }
+        //return average
         return round(totalAverage/count,5);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
 
 	@Override
     public List<Movie> getTopKMoviesAverage(long topK) {
+		// create one list for all movies and another list for topK which called return list
     	List<Movie> movieList = new ArrayList<Movie>();
     	List<Movie>returnList = new ArrayList<Movie>();
+    	//For each movie , add name and average score to movieList
         for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) 
         {
         	double averageScore = 0;
@@ -103,6 +115,7 @@ public class MoviesStorage implements IMoviesStorage {
         	averageScore = totalMovieAverage(key);
         	movieList.add(new Movie(key,averageScore));
         }
+        //Sort this list  and add topK to  returnList and return it
        Collections.sort(movieList, new Movie());
         for(int i=0;i<topK;i++)
         	returnList.add(movieList.get(i));
@@ -112,7 +125,7 @@ public class MoviesStorage implements IMoviesStorage {
 
     @Override
     public Movie movieWithHighestAverage() {
-    	
+    	//Call getTopKMoviesAverage with 1 
     	return getTopKMoviesAverage(1).get(0);
         //throw new UnsupportedOperationException("You have to implement this method on your own.");
     }
@@ -132,9 +145,11 @@ public class MoviesStorage implements IMoviesStorage {
     @Override
     public String mostReviewedProduct() {
     	Map<String, Long> mostPopularMovieReviewed;
+    	// Get Top reviewd movie by calling reviewCountPerMovieTopKMovies with K=1
 		mostPopularMovieReviewed =  reviewCountPerMovieTopKMovies(1);
 		Map.Entry<String,Long> entry = null;
-	
+		
+		//get the movie form the map returned and return it
 		entry=mostPopularMovieReviewed.entrySet().iterator().next();
 		if(entry==null){
 		throw new UnsupportedOperationException("No movie with Review ");
@@ -146,9 +161,12 @@ public class MoviesStorage implements IMoviesStorage {
 
     @Override
     public Map<String, Long> reviewCountPerMovieTopKMovies(int topK) {
+    	//List for all movies which we can sort
     	List<Movie> movieList = new ArrayList<Movie>();
-
+    	// Linked Hash Map that holds the Top K Movies
     	Map<String, Long>returnMap = new LinkedHashMap<String, Long>();
+    	//for each movie, get reviews as list and count them , then add 
+    	// movie name and reviews size to movieList
         for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) 
         {
         	double countReview = 0;
@@ -157,10 +175,12 @@ public class MoviesStorage implements IMoviesStorage {
         	countReview = reviews.size();
         	movieList.add(new Movie(key,countReview));
         }
+        //Sort movie list 
         Collections.sort(movieList, new Movie());
-        
+        //check if there are enough movies as K asked for , if not change K to be all movies rated
         if(movieList.size()< topK)
         	topK = movieList.size();
+        //add topK movies to Linked Hash Map , and return it
         for(int i=0;i<topK;i++)
         returnMap.put(movieList.get(i).getProductId(),(long) movieList.get(i).getScore());
         
@@ -172,9 +192,10 @@ public class MoviesStorage implements IMoviesStorage {
 
 	@Override
     public String mostPopularMovieReviewedByKUsers(int numOfUsers) {
-
+		// Create a list for all movies sorted by average
 		List <Movie> moviesHighScore = getTopKMoviesAverage(moviesCount());
-		
+		// then start form top and search for the movie reviewd by numOfUsers
+		//and then return it
 		for(Movie tempMovie: moviesHighScore)
 		{
 			int numOfRev = moviereviews.get(tempMovie.getProductId()).size();
@@ -299,20 +320,24 @@ public class MoviesStorage implements IMoviesStorage {
     	Map<String, Double> list = new HashMap<>();
     	int count = 0;
     	int score = 0;
+    	// for each movie review check  the list of users reviewd 
     	for (Map.Entry<String, List<String>> entry : helpfulnessUsers.entrySet()) 
         {
     		count = 0;
     		score = 0;
+    		// for each review count score out of total for this review
     		for(String helpfulness : entry.getValue())
     		{
     			String[] parts = helpfulness.split("/");
     			score+= Integer.parseInt(parts[0]);
     			count+= Integer.parseInt(parts[1]);
     		}
+    		// add user name and average score given
     		if(count!=0)
     			list.put(entry.getKey(),Double.valueOf(round((double)score/count, 5)));
     		
         }
+    	// sort list by score and then by name
     	List<Map.Entry<String, Double>> sortList=new ArrayList<Map.Entry<String, Double>>(list.entrySet());
     	Collections.sort(sortList, new Comparator<Map.Entry<String, Double>>() {
   		  public int compare(Map.Entry<String, Double> a, Map.Entry<String, Double> b){
@@ -327,8 +352,10 @@ public class MoviesStorage implements IMoviesStorage {
   				 
   		 }
   		});
+    //create new LinkedHashMap and add top K users to it 
     	Map<String, Double> sortedMap = new LinkedHashMap<String, Double>();
     	count = 0;
+    	//Get top K users from sortedMap
     	for(Map.Entry<String, Double> entry : sortList)
     	{
     		if(count>=k)
@@ -336,6 +363,7 @@ public class MoviesStorage implements IMoviesStorage {
     		sortedMap.put(entry.getKey(),entry.getValue());
     		count++;
     	}
+    	//return sortedMap with top K helpfull users
     	 if(sortedMap!=null)
     		 return sortedMap;
     	 else 
@@ -345,6 +373,7 @@ public class MoviesStorage implements IMoviesStorage {
     @Override
     public long moviesCount() {
     	long Count = 0;
+    	// Return movies count after counting them
    	 	for (@SuppressWarnings("unused") Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
     		Count++;
         }
