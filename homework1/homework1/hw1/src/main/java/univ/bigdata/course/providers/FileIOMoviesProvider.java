@@ -27,17 +27,18 @@ public class FileIOMoviesProvider implements MoviesProvider {
 	
     @Override
     public boolean hasMovie() {
-        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+       // While has movie is true , get next movie review 
     	boolean rtn;
     	rtn = scanner.hasNext();
     	if(!rtn)
+    		//If no movie revies left , close scanner
     		scanner.close();
     	return rtn;
     }
 
     @Override
     public MovieReview getMovie() {
-        //throw new UnsupportedOperationException("You have to implement this method on your own.");
+        //initialise all arguments with the starting string , so we can search for them in the review
     	MovieReview moviereview = null;
     	Movie movie;
     	double score;
@@ -52,16 +53,19 @@ public class FileIOMoviesProvider implements MoviesProvider {
     	String summary = "	review/summary: ";
     	String text = "	review/text: ";
     	
+    	//Get next line from input
     	review = scanner.nextLine();
     	if(review==null){
 		throw new UnsupportedOperationException("Null review");
 	}
+    	//split review line by tabs and save them into parts 
     	String[] parts =review.split("\\t+");
+    	//for each part split with the relevant agruments start and take second part
     	 for (int i=0;i< parts.length ; i++){
     		 parts[i] = parts[i].split("(product/productId: )|(review/userId: )|(review/profileName: )|(review/helpfulness: )|(review/score: )|(review/time: )|(review/text: )|(review/summary: )")[1];
     	 }
     	
-
+    	 //Check that there are no null or empty parts
     	productId = parts[0];
     	if(productId==null){
     		throw new UnsupportedOperationException("Null productId");
@@ -88,13 +92,16 @@ public class FileIOMoviesProvider implements MoviesProvider {
     	if(strTime==null){
     		throw new UnsupportedOperationException("Null strTime");
     	}
+    	//Parse time 
     	time = new Date(Integer.parseInt(strTime));
     	summary = parts[6];
     	if(summary==null){
     		throw new UnsupportedOperationException("Null summary");
     	}
     	text = parts[7];
+    	//Create a movie 
     	movie = new Movie(productId,score);
+    	// Create a movie review and return it.
     	moviereview = new MovieReview(movie,userId,profileName,helpfulness,time,summary,text);
     	return moviereview;
     }
