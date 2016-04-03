@@ -186,32 +186,30 @@ public class MoviesStorage implements IMoviesStorage {
     @Override
     public Map<String, Long> moviesReviewWordsCount(int topK) {
     	 Map<String, Long> map = new LinkedHashMap<>();
-       	 int count =0;
+    	 
+    	 //go over all each movie review 
     	 for (Map.Entry<String, List<MovieReview>> entry : moviereviews.entrySet()) {
-    		 count ++;
              List<MovieReview> reviews = entry.getValue();
+             
+             //for each review - get all of its words
              for(MovieReview review : reviews){
             	 String[] words= review.getReview().split("\\s");   	    
 				for (String w : words) {
-//					String w = W.toLowerCase();
 	    	        Long n = map.get(w);
+	    	        //increase the word counter if this word has already appeared before
 	    	        n = (n == null) ? 1 : ++n;
 	    	        map.put(w, n);
 	    	    }
 			
              }
     	 }
+    	 
+    	 //sort the map of words by their number of appearances. 
     	 List<Map.Entry<String, Long>> wordsCount = new ArrayList<Map.Entry<String, Long>>(map.entrySet());
     	 Collections.sort(wordsCount, new Comparator<Map.Entry<String, Long>>() {
     		  public int compare(Map.Entry<String, Long> a, Map.Entry<String, Long> b){
     			 if(a.getValue().equals(b.getValue()))
     				{
-//    				int c = a.getKey().compareTo(b.getKey()); 
-//    				if(c<=0){
-//    					return 1;
-//    				}
-//    				if(c>0)
-//    					return -1;
     				 return a.getKey().compareTo(b.getKey());
     				}
     			 if (a.getValue().longValue() > b.getValue().longValue())
@@ -221,6 +219,8 @@ public class MoviesStorage implements IMoviesStorage {
     				 
     		 }
     		});
+    	 
+    	 //limit the map to top k words.
     	 Map<String, Long> sortedMap = new LinkedHashMap<String, Long>();
          for(int i=0;i<topK;i++){
            	sortedMap.put(wordsCount.get(i).getKey(), wordsCount.get(i).getValue());
