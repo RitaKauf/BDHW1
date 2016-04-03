@@ -120,8 +120,11 @@ public class MoviesStorage implements IMoviesStorage {
     @Override
     public List<Movie> getMoviesPercentile(double percentile) {
     	long moviesInTotal = moviesCount();
-    	int moviesToPresent = (int)Math.ceil((double)((double)moviesInTotal/100) * (100- percentile));   	
+    	//total number of movies
+    	int moviesToPresent = (int)Math.ceil((double)((double)moviesInTotal/100) * (100- percentile)); 
+    	//one percent of movies(rounded up) multiplied by the percentile required which is the reduction of percentile from 100%
 		List<Movie>returnList = getTopKMoviesAverage(moviesToPresent);
+		//return list creation and assigned with the movies in the percentile required. 
 		return returnList;
         //throw new UnsupportedOperationException("You have to implement this method on your own.");		       
     }
